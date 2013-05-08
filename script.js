@@ -2,6 +2,7 @@ var countdown;
 var countdown_number;
 var html_string = "http://search.twitter.com/search.json";
 var num_tweet_display = 10;
+var check_interval = 3000;
 
 var html_data1 = "q=%23bieber&size=mini";
 var html_data2 = "q=%23firstworld&size=mini";
@@ -16,8 +17,9 @@ $(document).bind('pageinit',function () {
 	
 	for(var i=0;i < num_tweet_display;i++){		
 		layout.push('<li id="' + i + '" class="ui-li ui-li-static ui-btn-up-c ui-li-has-thumb">'+
-						'<img id = "profile_image" data-role="content" class="ui-li-thumb"></img>'+
-						'<div id ="content" data-role class="ui-li-heading"></div>'+
+						'<img id = "profile_image_preload" data-role="content" width=80 height=80 src=preload.png class="ui-li-thumb"></img>'+
+						'<img id = "profile_image" data-role="content" width=80 height=80 class="ui-li-thumb"></img>'+
+						'<div id ="content" data-role class="ui-li-content"></div>'+
 						'<div id="user" class="ui-li-desc"></div>'+
 						'<div id="timestamp" class="ui-li-desc"></div>'+
 					'</li>'
@@ -26,9 +28,14 @@ $(document).bind('pageinit',function () {
 		$('#tweet_list').append(layout[i]);
 	}
 	
+	for(var i=0;i < num_tweet_display;i++){
+		$('#'+i+'> #profile_image_preload' ).show();
+		$('#'+i+'> #profile_image' ).hide();
+	}
+	
 	setdata = html_data1;
 	get_tweets();
-	var timer = setInterval(get_tweets,1000);
+	var timer = setInterval(get_tweets,check_interval);
 	$('#result').bind('page_init', function() {
 		$('#tweet_list').listview('refresh');
 	});
@@ -41,7 +48,7 @@ function get_tweets(){
 	} else {
 		setdata = html_data1;
 	}
-	
+
 	$.ajax({
 		'type':    'GET',
 		'url':     html_string,
@@ -62,7 +69,7 @@ function display_tweets(data) {
 //from_user_name
 //profile_image_url
 //text
-	
+
 	var tweetObj = new Object();
 	for(var i=0;i < num_tweet_display;i++){
 		tweetObj = new Object();
@@ -114,14 +121,17 @@ function setup_tweet(index, tweetObj){
 	//load_profile_image(index,tweetObj.image_url)
 	
 	$('#'+index+'> #profile_image' ).hide();
-	$('#'+index+'> #profile_image_preload' ).show();	
+	$('#'+index+'> #profile_image_preload' ).show();
+	
+	$('#tweet_list').listview('refresh');
+	
+	
 	$('#'+index+'> #profile_image').attr('src', tweetObj.image_url).load(function(){
 		if(this.complete){
 			$('#'+index+'> #profile_image' ).show();
 			$('#'+index+'> #profile_image_preload' ).hide();
 		}
 	});
-	
 	
 	$('#tweet_list').listview('refresh');
 }
