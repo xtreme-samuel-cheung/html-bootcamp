@@ -23,7 +23,7 @@ $(document).ready(function () {
 	
 	for(var i=0;i < num_tweet_display;i++){
 		layout.push('<li id="' + i + '">'+
-						'<img id = "profile_image"></img>' + 
+						'<img id = "profile_image" width="48" height="48"></img>' + 
 						'<div id = "user"></div>'+
 						'<div id = "content"></div>'+
 						'<div id = "timestamp"></div>'+
@@ -37,7 +37,8 @@ $(document).ready(function () {
 	
 	setdata = html_data1;
 	get_tweets();
-	refresh_trigger();
+	var timer = setInterval(get_tweets,5000);
+	//refresh_trigger();
 	
 	/*
     $("button").click(function(){
@@ -62,7 +63,7 @@ function get_tweets(){
 		'contentType':	"application/json; charset=utf-8",
 		'data'	:	setdata,
 		'async':   true,
-		'cache':   false,
+		'cache':   true,
 		'global':  false,
 		'jsonpCallback':	"display_tweets"
 	});
@@ -102,24 +103,21 @@ function display_tweets(data) {
 	
 	var tweetObj = new Object();
 	for(var i=0;i < num_tweet_display;i++){
+		
 		tweetObj.user = data.results[i].from_user;
 		tweetObj.content = data.results[i].text;
 		tweetObj.timestamp = data.results[i].created_at;
-		tweetObj.image_url = data.results[i].image_url;
+		tweetObj.image_url = data.results[i].profile_image_url;
 		
 		twitterList[i] = tweetObj;
 		
-		//$('#'+i).html(tweetObj.content);
-		//setup_tweet(i,tweetObj);
-		$('#'+i+' > #user' ).html(tweetObj.user);
-		$('#'+i+' > #content' ).html(tweetObj.content);
-		$('#'+i+' > #timestamp' ).html(tweetObj.timestamp);
-		$('#'+i+' > #profile_image' ).attr("src",tweetObj.image_url);
-		/*if(twitterList[i] == null){
+		setup_tweet(i,tweetObj);
+		/*
+		if(twitterList[i] == null){
 			tweetObj.user = data.results[i].from_user;
 			tweetObj.content = data.results[i].text;
 			tweetObj.timestamp = data.results[i].created_at;
-			tweetObj.image_url = data.results[i].image_url;
+			tweetObj.image_url = data.results[i].profile_image_url;
 			
 			twitterList.push(tweetObj);
 			setup_tweet(i,tweetObj);
@@ -128,13 +126,14 @@ function display_tweets(data) {
 				tweetObj.user = data.results[i].from_user;
 				tweetObj.content = data.results[i].text;
 				tweetObj.timestamp = data.results[i].created_at;
-				tweetObj.image_url = data.results[i].image_url;
+				tweetObj.image_url = data.results[i].profile_image_url;
 				
 				twitterList[i] = tweetObj;
 				//$('#'+i).html(tweetObj.content);
 				setup_tweet(i,tweetObj);
 			}
 		}*/
+		
 	}
 	
 	/*
