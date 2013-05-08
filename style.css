@@ -1,0 +1,56 @@
+li{
+	list-style-type:none;
+	position:	relative;
+	float:	left;
+    padding-bottom: 9px;
+    margin-bottom: 10px;
+	width:		100%;
+}
+
+#image_wrapper {
+	position:	relative;
+	float:		left;
+	display:	block;
+	width:		%20;
+}
+
+#content_wrapper {
+	position:	relative;
+	float:		left;
+	display:	block;
+	width:		%80;
+}
+
+#profile_image,#profile_image_preload{
+
+}
+
+#user{
+	position:	relative;
+	float:		left;
+	display:	block;
+	margin-left:	10px;
+}
+
+#timestamp{
+	position:	realtive;
+	float:		left;
+	display:	block;
+	margin-left:	10px;
+
+}
+
+#content{
+	position:	relative;
+	float:		left;
+	display:	block;
+	
+	width:		250px;
+	border:			2px solid black;
+	cursor:			default;
+	margin-left:	7px;
+	margin-bottom:	5px;
+	-moz-box-shadow:    -3px 3px 5px 6px #ccc;
+	-webkit-box-shadow: -3px 3px 5px 6px #ccc;
+	box-shadow:         -3px 3px 5px 3px #ccc;
+}

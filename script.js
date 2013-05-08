@@ -23,11 +23,15 @@ $(document).ready(function () {
 	
 	for(var i=0;i < num_tweet_display;i++){
 		layout.push('<li id="' + i + '">'+
-						'<img id = "profile_image" width="48" height="48"></img>'+
-						'<img id = "profile_image_preload" src="preload.png" width="48" height="48"></img>' + 
-						'<div id = "user"></div>'+
-						'<div id = "content"></div>'+
-						'<div id = "timestamp"></div>'+
+						'<div id = "image_wrapper">'+
+							'<img id = "profile_image" width="48" height="48"></img>'+
+							'<img id = "profile_image_preload" src="preload.png" width="48" height="48"></img>' + 
+						'</div>'+
+						'<div id ="content_wrapper">'+
+							'<div id = "user"></div>'+
+							'<br><div id = "content"></div>'+
+							'<br><div id = "timestamp"></div>'+
+						'</div>' +
 					'</li>');
 	}
 	$('<ul/>', {
@@ -35,6 +39,10 @@ $(document).ready(function () {
 			html:layout
 	}).appendTo('body');
 	
+	for(var i=0;i < num_tweet_display;i++){
+		$('#'+i+'> #image_wrapper > #profile_image_preload' ).show();
+		$('#'+i+'> #image_wrapper > #profile_image' ).hide();
+	}
 	
 	setdata = html_data1;
 	get_tweets();
@@ -146,19 +154,18 @@ function display_tweets(data) {
 }
 
 function setup_tweet(index, tweetObj){
-	$('#'+index+' > #user' ).html(tweetObj.user);
-	$('#'+index+' > #content' ).html(tweetObj.content);
-	$('#'+index+' > #timestamp' ).html(tweetObj.timestamp);
+	$('#'+index+'> #content_wrapper > #user' ).html(tweetObj.user);
+	$('#'+index+'> #content_wrapper > #content' ).html(tweetObj.content);
+	$('#'+index+'> #content_wrapper > #timestamp' ).html(tweetObj.timestamp);
 	//load_profile_image(index,tweetObj.image_url)
 	
-	
-	$('#'+index+' > #profile_image_preload' ).show();
-	$('#'+index+' > #profile_image' ).hide();
+	$('#'+index+'> #image_wrapper > #profile_image' ).hide();
+	$('#'+index+'> #image_wrapper > #profile_image_preload' ).show();	
 	//'<img id = "profile_image" width="48" height="48"></img>'
-	$('#'+index+' > #profile_image').attr('src', tweetObj.image_url, "id","profile_image").load(function(){
+	$('#'+index+'> #image_wrapper > #profile_image').attr('src', tweetObj.image_url).load(function(){
 		if(this.complete){
-			$('#'+index+' > #profile_image' ).show();
-			$('#'+index+' > #profile_image_preload' ).hide();
+			$('#'+index+'> #image_wrapper > #profile_image' ).show();
+			$('#'+index+'> #image_wrapper > #profile_image_preload' ).hide();
 		}
 	});
 	
