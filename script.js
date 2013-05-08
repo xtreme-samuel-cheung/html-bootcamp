@@ -8,8 +8,8 @@ var num_tweet_display = 10;
 	size: "mini",
 	callback: "?"
 };*/
-var html_data1 = "q=%23firstworld&size=mini";
-var html_data2 = "q=%23bieber&size=mini";
+var html_data1 = "q=%23bieber&size=mini";
+var html_data2 = "q=%23firstworld&size=mini";
 var setdata;
 //var html_string = "https://api.twitter.com/1.1/search/tweets.json?q=%23freebandnames&since_id=24012619984051000&max_id=250126199840518145&result_type=mixed&count=4";
 
@@ -59,11 +59,11 @@ $(document).ready(function () {
 });
 
 function get_tweets(){
-	if(setdata === html_data1){
+	/*if(setdata === html_data1){
 		setdata = html_data2;
 	} else {
 		setdata = html_data1;
-	}
+	}*/
 	
 	$.ajax({
 		'type':    'GET',
@@ -112,36 +112,36 @@ function display_tweets(data) {
 	
 	var tweetObj = new Object();
 	for(var i=0;i < num_tweet_display;i++){
-		
+		/*
 		tweetObj.user = data.results[i].from_user;
 		tweetObj.content = data.results[i].text;
-		tweetObj.timestamp = data.results[i].created_at;
+		tweetObj.timestamp = new Date(Date.parse(data.results[i].created_at));
 		tweetObj.image_url = data.results[i].profile_image_url;
 		
 		twitterList[i] = tweetObj;
-		
 		setup_tweet(i,tweetObj);
-		/*
+		*/
+		tweetObj = new Object();
 		if(twitterList[i] == null){
 			tweetObj.user = data.results[i].from_user;
 			tweetObj.content = data.results[i].text;
-			tweetObj.timestamp = data.results[i].created_at;
+			tweetObj.timestamp = new Date(Date.parse(data.results[i].created_at));
 			tweetObj.image_url = data.results[i].profile_image_url;
 			
-			twitterList.push(tweetObj);
+			twitterList[i] = tweetObj;
 			setup_tweet(i,tweetObj);
 		} else {
-			if(twitterList[i].timestamp < data.results[i].created_at){
+			if(twitterList[i].timestamp.getTime() < new Date(data.results[i].created_at).getTime()){
 				tweetObj.user = data.results[i].from_user;
 				tweetObj.content = data.results[i].text;
-				tweetObj.timestamp = data.results[i].created_at;
+				tweetObj.timestamp = new Date(Date.parse(data.results[i].created_at));
 				tweetObj.image_url = data.results[i].profile_image_url;
 				
 				twitterList[i] = tweetObj;
 				//$('#'+i).html(tweetObj.content);
 				setup_tweet(i,tweetObj);
 			}
-		}*/
+		}
 		
 	}
 	
@@ -156,7 +156,7 @@ function display_tweets(data) {
 function setup_tweet(index, tweetObj){
 	$('#'+index+'> #content_wrapper > #user' ).html(tweetObj.user);
 	$('#'+index+'> #content_wrapper > #content' ).html(tweetObj.content);
-	$('#'+index+'> #content_wrapper > #timestamp' ).html(tweetObj.timestamp);
+	$('#'+index+'> #content_wrapper > #timestamp' ).html(tweetObj.timestamp.toDateString()+" "+tweetObj.timestamp.toLocaleTimeString());
 	//load_profile_image(index,tweetObj.image_url)
 	
 	$('#'+index+'> #image_wrapper > #profile_image' ).hide();
