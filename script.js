@@ -23,7 +23,8 @@ $(document).ready(function () {
 	
 	for(var i=0;i < num_tweet_display;i++){
 		layout.push('<li id="' + i + '">'+
-						'<img id = "profile_image" width="48" height="48"></img>' + 
+						'<img id = "profile_image" width="48" height="48"></img>'+
+						'<img id = "profile_image_preload" src="preload.png" width="48" height="48"></img>' + 
 						'<div id = "user"></div>'+
 						'<div id = "content"></div>'+
 						'<div id = "timestamp"></div>'+
@@ -148,5 +149,18 @@ function setup_tweet(index, tweetObj){
 	$('#'+index+' > #user' ).html(tweetObj.user);
 	$('#'+index+' > #content' ).html(tweetObj.content);
 	$('#'+index+' > #timestamp' ).html(tweetObj.timestamp);
-	$('#'+index+' > #profile_image' ).attr("src",tweetObj.image_url);
+	//load_profile_image(index,tweetObj.image_url)
+	
+	
+	$('#'+index+' > #profile_image_preload' ).show();
+	$('#'+index+' > #profile_image' ).hide();
+	//'<img id = "profile_image" width="48" height="48"></img>'
+	$('#'+index+' > #profile_image').attr('src', tweetObj.image_url, "id","profile_image").load(function(){
+		if(this.complete){
+			$('#'+index+' > #profile_image' ).show();
+			$('#'+index+' > #profile_image_preload' ).hide();
+		}
+	});
+	
+	//$('#'+index+' > #profile_image' ).attr("src",tweetObj.image_url);
 }
