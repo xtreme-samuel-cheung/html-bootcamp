@@ -1,5 +1,5 @@
 
-var html_string = "http://search.twitter.com/search.json";
+var html_string = "https://search.twitter.com/search.json";
 var num_tweet_display = 5;
 var num_tweet_store;
 var check_interval = 3000;
@@ -9,13 +9,13 @@ var html_data2 = "q=%23firstworld&size=mini";
 var setdata;
 
 var twitterList = [];
-var downloadedImage = [];
+var storedImageList = [];
 
 var since_id;
 var max_id;
 var count = 5;
 
-var current_display_index = 0;
+var display_index = 0;
 
 var debug;
 
@@ -48,23 +48,36 @@ $(document).bind('pageinit',function () {
 	*/
 	
 	num_tweet_store = num_tweet_display+5;
-	setdata = html_data1+"&count="+count;
+	setdata = html_data1;
 	get_tweets_init();
-	var timer = setInterval(get_tweets_latest,check_interval);
+	render_tweets();	
+	//var timer = setInterval(get_tweets_latest,check_interval);
 	$('#result').bind('page_init', function() {
 		$('#tweet_list').listview('refresh');
 	});
 	
 	$(window).scroll(function(){
 		 if($(window).scrollTop() == $(document).height() - $(window).height()){
-			alert("bottom");
+			//alert("bottom");
 			get_tweets_older();
 			//get_tweets_latest();
-		 }
+			render_tweets();
+			$(document).scrollTop(0);
+			display_index += num_tweet_display;
+		 } /*else if($(window).scrollTop() == 0 && display_index > 0){
+			display_index -= num_tweet_display;
+		 	render_tweets();
+			$(document).scrollTop($(document).scrollTop+10);
+			debut= $(document).scrollTop;
+		 }*/
 	});
+	
+	
+	
 });
 
 function get_tweets_init(){
+	
 	$.ajax({
 		'type':    'GET',
 		'url':     html_string,
@@ -74,8 +87,8 @@ function get_tweets_init(){
 		'async':   true,
 		'cache':   true,
 		'global':  false,
-		'jsonpCallback':	"store_tweets_init"
-	});
+		'jsonpCallback':	"store_tweets_init",
+	})
 }
 
 function get_tweets_latest(){
@@ -109,12 +122,14 @@ function get_tweets_older(){
 }
 
 function store_tweets_init(data){
+	debug = data;
 	var tweetObj = new Object();
 	var latestTweets = [];
+	debug = data;
 	for(var i=0;i < count;i++){
 		twitterList[i] = setTwitterObj(data.results[i]);
 	}
-	debug = data;
+
 	//max_id = data.max_id;
 	max_id = twitterList[twitterList.length-1].id
 	since_id = twitterList[0].id;
@@ -125,7 +140,6 @@ function store_tweets_latest(data){
 	if(twitterList == null){
 		return;
 	}
-	debug = data;
 	
 	for(var i=data.results.length - 2;i >= 0;i--){
 		tweetObj = setTwitterObj(data.results[i]);;
@@ -160,7 +174,7 @@ function setTwitterObj(dataEntry){
 	return tweetObj;
 }
 
-function display_tweets(data) {
+function display_tweets_stuff(data) {
 //test = data["results"];
 //created_at
 //from_user
@@ -208,26 +222,46 @@ function display_tweets(data) {
 	}
 }
 
-function display_tweet(index, listIndex, tweetObj){
+function render_tweets(){
+	if(twitterList.length < 1){
+		return;
+	}
+	
+	//alert(twitterList[display_index].user);	
+	//display_tweet(0,twitterList[0]);
+	
+	for(var i = 0; i < num_tweet_display; i++){
+		display_tweet(i,twitterList[i+display_index]);
+	}
+	
+}
+
+function display_tweet(index, tweetObj){
 	//$('li[id='+index+'][id=user]').html(tweetObj.user);
 	
 	$('#'+index+'> #user' ).html(tweetObj.user);
 	$('#'+index+'> #content' ).html(tweetObj.content);
 	$('#'+index+'> #timestamp' ).html(tweetObj.timestamp.toDateString()+" "+tweetObj.timestamp.toLocaleTimeString());
-	//load_profile_image(index,tweetObj.image_url)
 	
 	$('#'+index+'> #profile_image' ).hide();
 	//$('#'+index+'> #profile_image_preload' ).show();
 	
 	$('#tweet_list').listview('refresh');
 	
-	
-	$('#'+index+'> #profile_image').attr('src', tweetObj.image_url).load(function(){
-		if(this.complete){
-			$('#'+index+'> #profile_image' ).show();
-			//$('#'+index+'> #profile_image_preload' ).hide();
-		}
-	});
+	if(tweetObj.id in storedImageList){
+		$('#'+index+'> #profile_image').src = storedImageList[tweetObj.id].src;
+	} else {
+			$('#'+index+'> #profile_image').attr('src', tweetObj.image_url).load(function(){
+				if(this.complete){
+					$('#'+index+'> #profile_image' ).show();
+					//alert(tweetObj.id);
+					var hash = tweetObj.id;
+					storedImageList[tweetObj.id] = new Image();
+					storedImageList[tweetObj.id].src = tweetObj.image_url;
+					//$('#'+index+'> #profile_image_preload' ).hide();
+				}
+			});
+	}	
 	
 	$('#tweet_list').listview('refresh');
 }
