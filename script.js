@@ -1,6 +1,6 @@
 
 var html_string = "http://search.twitter.com/search.json";
-var num_tweet_display = 10;
+var num_tweet_display = 5;
 var num_tweet_store;
 var check_interval = 3000;
 
@@ -15,6 +15,8 @@ var since_id;
 var max_id;
 var count = 5;
 
+var current_display_index = 0;
+
 var debug;
 
 $(document).bind('pageinit',function () {
@@ -24,7 +26,7 @@ $(document).bind('pageinit',function () {
 	
 	//'<img id = "profile_image_preload" data-role="content" width=80 height=80 src=preload.png class="ui-li-thumb"></img>'+
 	
-	for(var i=0;i < num_tweet_display;i++){		
+	for(var i=0;i < num_tweet_display;i++){
 		layout.push('<li id="' + i + '" class="ui-li ui-li-static ui-btn-up-c ui-li-has-thumb">'+
 						'<img id = "profile_image" data-role="content" width=80 height=80 class="ui-li-thumb"></img>'+
 						'<div id ="content" data-role class="ui-li-content"></div>'+
@@ -48,7 +50,7 @@ $(document).bind('pageinit',function () {
 	num_tweet_store = num_tweet_display+5;
 	setdata = html_data1+"&count="+count;
 	get_tweets_init();
-	//var timer = setInterval(get_tweets_latest,check_interval);
+	var timer = setInterval(get_tweets_latest,check_interval);
 	$('#result').bind('page_init', function() {
 		$('#tweet_list').listview('refresh');
 	});
@@ -112,7 +114,7 @@ function store_tweets_init(data){
 	for(var i=0;i < count;i++){
 		twitterList[i] = setTwitterObj(data.results[i]);
 	}
-	
+	debug = data;
 	//max_id = data.max_id;
 	max_id = twitterList[twitterList.length-1].id
 	since_id = twitterList[0].id;
@@ -125,7 +127,7 @@ function store_tweets_latest(data){
 	}
 	debug = data;
 	
-	for(var i=data.results.length - 1;i >= 0;i--){
+	for(var i=data.results.length - 2;i >= 0;i--){
 		tweetObj = setTwitterObj(data.results[i]);;
 		twitterList.unshift(tweetObj);
 	}
