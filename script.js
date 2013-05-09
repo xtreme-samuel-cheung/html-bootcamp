@@ -12,6 +12,12 @@ var setdata;
 var twitterList = [];
 var downloadedImage = [];
 
+var since_id;
+var max_id;
+var count;
+
+var debug;
+
 $(document).bind('pageinit',function () {
 	var screen_height = screen.height;
 	var tweet_height = screen.height/num_tweet_display;
@@ -41,9 +47,10 @@ $(document).bind('pageinit',function () {
 	*/
 	
 	num_tweet_store = num_tweet_display+5;
-	setdata = html_data1;
-	get_tweets();
-	var timer = setInterval(get_tweets,check_interval);
+	count = 2;
+	setdata = html_data1+"&count="+count;
+	get_tweets_init();
+	//var timer = setInterval(get_tweets_latest,check_interval);
 	$('#result').bind('page_init', function() {
 		$('#tweet_list').listview('refresh');
 	});
@@ -51,21 +58,14 @@ $(document).bind('pageinit',function () {
 	
 	$(window).scroll(function(){
 		 if($(window).scrollTop() == $(document).height() - $(window).height()){
-			num_tweet_display++;
 			alert("bottom");
+			get_tweets_older();
 		 }
 	});
 	
 });
 
-function get_tweets(){
-	/*
-	if(setdata === html_data1){
-		setdata = html_data2;
-	} else {
-		setdata = html_data1;
-	}
-	*/
+function get_tweets_init(){
 	$.ajax({
 		'type':    'GET',
 		'url':     html_string,
@@ -75,42 +75,90 @@ function get_tweets(){
 		'async':   true,
 		'cache':   true,
 		'global':  false,
-		'jsonpCallback':	"update_tweets"
+		'jsonpCallback':	"store_tweets_init"
 	});
 }
 
-function update_tweets(data){
-	var index = 0;
-	
-	var tweetObj = new Object();
-	var latestTweets = [];
-	if(twitterList[i] == null){
-		for(var i=0;i < num_tweet_store;i++){
-			tweetObj = new Object();
-			tweetObj.user = data.results[i].from_user;
-			tweetObj.content = data.results[i].text;
-			tweetObj.timestamp = new Date(Date.parse(data.results[i].created_at));
-			tweetObj.image_url = data.results[i].profile_image_url;
-			
-			twitterList[i] = tweetObj;
-		}
-	} else {
-		while(twitterList[0].timestamp.getTime() < new Date(data.results[index].created_at).getTime()){
-			
-			tweetObj = new Object();
-			tweetObj.user = data.results[index].from_user;
-			tweetObj.content = data.results[index].text;
-			tweetObj.timestamp = new Date(Date.parse(data.results[index].created_at));
-			tweetObj.image_url = data.results[index].profile_image_url;
-			
-			latestsTweets[index] = tweetObj;
-			index++;
-		}
-		
-		twitterList.unshift(latestsTweets);
-	}
+function get_tweets_latest(){
+	var latestdata = setdata+"&since_id="+since_id;
+	$.ajax({
+		'type':    'GET',
+		'url':     html_string,
+		'dataType':	'jsonp',
+		'contentType':	"application/json; charset=utf-8",
+		'data'	:	latestdata,
+		'async':   true,
+		'cache':   true,
+		'global':  false,
+		'jsonpCallback':	"store_tweets_latest"
+	});
 }
 
+function get_tweets_older(){
+	var olderdata = setdata+"&max_id="+max_id;
+	$.ajax({
+		'type':    'GET',
+		'url':     html_string,
+		'dataType':	'jsonp',
+		'contentType':	"application/json; charset=utf-8",
+		'data'	:	olderdata,
+		'async':   true,
+		'cache':   true,
+		'global':  false,
+		'jsonpCallback':	"store_tweets_older"
+	});
+}
+
+function store_tweets_init(data){
+	var tweetObj = new Object();
+	var latestTweets = [];
+	for(var i=0;i < count;i++){
+		twitterList[i] = setTwitterObj(data.results[i]);
+	}
+	
+	//max_id = data.max_id;
+	max_id = twitterList[twitterList.length-1].id
+	since_id = twitterList[0].id;
+}
+
+function store_tweets_latest(data){
+	var latestsTweets = [];
+	if(twitterList == null){
+		return;
+	}
+	for(var i=count-1;i >= 0;i--){
+		tweetObj = setTwitterObj(data.results[i]);;
+		twitterList.unshift(tweetObj);
+	}
+	
+	since_id = twitterList[0].id;
+}
+
+function store_tweets_older(data){
+	var olderTweets = [];
+	if(twitterList == null){
+		return;
+	}
+	debug = data;
+	for(var i=0;i < count;i++){
+		tweetObj = setTwitterObj(data.results[i]);
+		twitterList.push(tweetObj);
+	}
+	
+	//max_id = data.max_id;
+	max_id = twitterList[twitterList.length-1].id;
+}
+
+function setTwitterObj(dataEntry){
+	var tweetObj = new Object();
+	tweetObj.user = dataEntry.from_user;
+	tweetObj.content = dataEntry.text;
+	tweetObj.timestamp = new Date(Date.parse(dataEntry.created_at));
+	tweetObj.image_url = dataEntry.profile_image_url;
+	tweetObj.id = dataEntry.id;
+	
+	return tweetObj;
+}
 
 function display_tweets(data) {
 //test = data["results"];
