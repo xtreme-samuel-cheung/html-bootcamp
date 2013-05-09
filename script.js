@@ -1,5 +1,4 @@
-var countdown;
-var countdown_number;
+
 var html_string = "http://search.twitter.com/search.json";
 var num_tweet_display = 10;
 var num_tweet_store;
@@ -14,7 +13,7 @@ var downloadedImage = [];
 
 var since_id;
 var max_id;
-var count;
+var count = 5;
 
 var debug;
 
@@ -47,7 +46,6 @@ $(document).bind('pageinit',function () {
 	*/
 	
 	num_tweet_store = num_tweet_display+5;
-	count = 2;
 	setdata = html_data1+"&count="+count;
 	get_tweets_init();
 	//var timer = setInterval(get_tweets_latest,check_interval);
@@ -55,14 +53,13 @@ $(document).bind('pageinit',function () {
 		$('#tweet_list').listview('refresh');
 	});
 	
-	
 	$(window).scroll(function(){
 		 if($(window).scrollTop() == $(document).height() - $(window).height()){
 			alert("bottom");
 			get_tweets_older();
+			//get_tweets_latest();
 		 }
 	});
-	
 });
 
 function get_tweets_init(){
@@ -126,7 +123,9 @@ function store_tweets_latest(data){
 	if(twitterList == null){
 		return;
 	}
-	for(var i=count-1;i >= 0;i--){
+	debug = data;
+	
+	for(var i=data.results.length - 1;i >= 0;i--){
 		tweetObj = setTwitterObj(data.results[i]);;
 		twitterList.unshift(tweetObj);
 	}
@@ -139,7 +138,6 @@ function store_tweets_older(data){
 	if(twitterList == null){
 		return;
 	}
-	debug = data;
 	for(var i=0;i < count;i++){
 		tweetObj = setTwitterObj(data.results[i]);
 		twitterList.push(tweetObj);
